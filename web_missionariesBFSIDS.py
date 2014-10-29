@@ -82,17 +82,17 @@ print("elapsed time: %.2fs" % time.perf_counter())
 
 # while there are states to check
 while len(queue) > 0:
-    current = queue[0]
+    currentShore = queue[0]
     del queue[0]
-    if current.isGoal(): break
-    searched[str(current)] = True
-    print("Examining %s" % current)
+    if currentShore.isGoal(): break
+    searched[str(currentShore)] = True
+    print("Examining %s" % currentShore)
     for miss in range(0, 3):
         for cani in range(max(0, 1 - miss), 3 - miss):
-            newState = copy.deepcopy(current)
-            newState.parent = current
+            newState = copy.deepcopy(currentShore)
+            newState.parent = currentShore
             newState.cross(Shore(miss, cani))
-            transition = "  %s + %sm%sc -> %s (%d)" % (current, miss, cani, newState, len(queue))
+            transition = "  %s + %sm%sc -> %s (%d)" % (currentShore, miss, cani, newState, len(queue))
             if not newState.isLegal() or str(newState) in searched:
                 pass # print("%s [skipped]" % transition)
             else:
@@ -100,12 +100,12 @@ while len(queue) > 0:
                 print(transition)
 
 path = ""
-while current is not None:
-    path = " + %s\n   %s%s" % (current.lastCross, current, path)
+while currentShore is not None:
+    path = " + %s\n   %s%s" % (currentShore.lastCross, currentShore, path)
     try:
-        current = current.parent
+        currentShore = currentShore.parent
     except AttributeError:
-        current = None
+        currentShore = None
 path = path[8:]
 
 print("\nBreadth-First Solution:")
@@ -114,20 +114,20 @@ print("elapsed time: %.2fs" % time.perf_counter())
 print("\n\n")
 
 def iterative_deepening_search(goal, maxdepth = 50):
-    def depth_limited_search(current, limit = 1):
-        if current.isGoal(): return [current]
+    def depth_limited_search(currentShore, limit = 1):
+        if currentShore.isGoal(): return [currentShore]
         if limit > 0:
-            searched[str(current)] = True
-            print("  Examining %s" % current)
+            searched[str(currentShore)] = True
+            print("  Examining %s" % currentShore)
             for miss in range(0, 3):
                 for cani in range(max(0, 1 - miss), 3 - miss):
-                    newState = copy.deepcopy(current)
+                    newState = copy.deepcopy(currentShore)
                     newState.cross(Shore(miss, cani))
                     if newState.isLegal() and not str(newState) in searched:
-                        print("    %s + %sm%sc -> %s (%d)" % (current, miss, cani, newState, limit))
+                        print("    %s + %sm%sc -> %s (%d)" % (currentShore, miss, cani, newState, limit))
                         path = depth_limited_search(newState, limit - 1)
                         if path is not None:
-                            path.insert(0, current)
+                            path.insert(0, currentShore)
                             return path
 
     for limit in range(2, maxdepth):
@@ -138,8 +138,8 @@ def iterative_deepening_search(goal, maxdepth = 50):
 
 pathlist = iterative_deepening_search(State(Shore(3, 3)))
 path = ""
-for current in pathlist:
-    path = "%s + %s\n    %s" % (path, current.lastCross, current)
+for currentShore in pathlist:
+    path = "%s + %s\n    %s" % (path, currentShore.lastCross, currentShore)
 path = path[8:]
 
 print("\nIterative-Deepening Solution:")

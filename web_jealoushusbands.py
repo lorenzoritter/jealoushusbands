@@ -17,11 +17,11 @@ boat = 0
 def alterbit(bit):
     return abs(bit - 1)
 
-def jealousy(d):
+def jealousy(current):
     for i in [1,2,3]:
-        if d["h" + str(i)] != d["w" + str(i)]:
+        if current["h" + str(i)] != current["w" + str(i)]:
         # husband is not with his wife
-            if (d["h1"] == d["w" + str(i)]) or (d["h2"] == d["w" + str(i)]) or (d["h3"] == d["w" + str(i)]):
+            if (current["h1"] == current["w" + str(i)]) or (current["h2"] == current["w" + str(i)]) or (current["h3"] == current["w" + str(i)]):
             # another husband is with the wife, so jealousy occurs
                 return 1
     return 0
@@ -30,13 +30,13 @@ queue = [people_dict]
 searched = []
 
 def turn():
-    current = queue[0]
-    draw(current)
+    currentShore = queue[0]
+    draw(currentShore)
     global boat
     # people on the same side as the boat are "good"
     good_people = []
     for i in people_names:
-        if current[i] == boat:
+        if currentShore[i] == boat:
             good_people.append(i)
     print("Available to choose from: " + ', '.join(good_people))
     
@@ -55,7 +55,7 @@ def turn():
                         return 0
 
             # check that when the move is completed, there is no jealousy
-            temp_current = dict(current)
+            temp_current = dict(currentShore)
             # dry-run to see if there are any jealous husbands
             for i in people_names:
                 if i in move:
@@ -67,7 +67,7 @@ def turn():
             counter = 0
             for i in people_names:
                 if i in move:
-                    current[i] = alterbit(current[i])
+                    currentShore[i] = alterbit(currentShore[i])
                     counter += 1
             if counter != 0:
                 boat = alterbit(boat) # don't move the boat if no one crossed

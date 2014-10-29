@@ -15,17 +15,17 @@ people_dict = {"h1": 0, "h2": 0, "h3": 0, "w1": 0, "w2": 0, "w3": 0, "b": 0}
 queue = [people_dict]
 searched = []
 following = {}
-current = {}
-current_names = list(current.keys())
+currentShore = {}
+current_names = list(currentShore.keys())
 
 def alterbit(bit):
     return abs(bit - 1)
 
-def jealousy(d):
+def jealousy(current):
     for i in [1,2,3]:
-        if d["h" + str(i)] != d["w" + str(i)]:
+        if current["h" + str(i)] != current["w" + str(i)]:
         # husband is not with his wife
-            if (d["h1"] == d["w" + str(i)]) or (d["h2"] == d["w" + str(i)]) or (d["h3"] == d["w" + str(i)]):
+            if (current["h1"] == current["w" + str(i)]) or (current["h2"] == current["w" + str(i)]) or (current["h3"] == current["w" + str(i)]):
             # another husband is with the wife, so jealousy occurs
                 return 1
     return 0
@@ -41,13 +41,13 @@ def goodside(good_people, move):
 
 
 def turn():
-    current = queue.pop(0)
-#    draw(current)
+    currentShore = queue.pop(0)
+#    draw(currentShore)
     
     # people on the same side as the boat are "good"
     good_people = []
     for i in current_names:
-        if current[i] == current[6]:
+        if currentShore[i] == currentShore[6]:
             good_people.append(i)
     print("Available to choose from: " + ', '.join(good_people))
     
@@ -62,7 +62,7 @@ def turn():
                 counter = 0
                 for i in current_names:
                     if i in move:
-                        following[i] = alterbit(current[i])
+                        following[i] = alterbit(currentShore[i])
                         # check if there is jealousy
                         if jealousy(following):
                             print("A wife cannot be left with another man unless her husband is present. -> Discarded state ", following)
@@ -94,7 +94,7 @@ def draw(position_dict):
     print(' '.join(crossed) + "\n")
 
 turn_number = 0
-while not (sum(current[i] for i in current_names) == 6):
+while not (sum(currentShore[i] for i in current_names) == 6):
     turn()
     turn_number += 1
 print("Congratulations! You won in " + str(turn_number) + " turns. (Minimum 11)")

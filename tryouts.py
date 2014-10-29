@@ -4,9 +4,9 @@ Created on 29.10.2014
 @author: Lorenzo Ritter
 '''
 
-people_dict = {"h1": 0, "h2": 0, "h3": 0, "w1": 0, "w2": 0, "w3": 0}
-people_names = list(people_dict.keys())
+move = [2,4]
+count = [3,6,4,7,5,8,5]
 
-print(people_dict)
-print(dict(people_dict))
-print(people_names)
+
+    
+print(sum(count))
