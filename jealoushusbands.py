@@ -57,12 +57,12 @@ def move(cap, state, movement, result, start):                      # computes a
     for i in range(start, len(state.shore)):
         if isGood(state)[i] == 1:                                   # if the person is on the same side as the boat
             movement.append(i)                                      # add the person to the list of possible moves
-            if cap > 1:                                             # if ther is more space in the boat
-                move(cap-1, state, movement, result,i)              # iterate until the boat is full, start for-loop with i to prevent duplicate (permutations)
+            if cap > 1:                                             # if there is more space in the boat
+                move(cap-1, state, movement, result,i)              # iterate; start for-loop with i to prevent duplicates (permutations)
             if cap == 1:                                            # if the boat is full
                 result.append(deepcopy(movement))                   # add move to the result array
             movement.pop()                                          # when returning to the outer iteration, pop the last item
-    return result                                                   # return an array of possible move
+    return result                                                   # return an array of possible moves
 
 def expand(state): 
     following = deepcopy(state)
@@ -84,17 +84,15 @@ def expand(state):
             
 
 
-def BFS(inode):
+def BFS():
     d = -1                                                      # current depth
-    noStates = 0
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
         current = frontier.pop(0)                               # examine first item from frontier (FIFO)
         
-        current.heur = h(current)
-        if current.heur == 0:                                   # goal check
+        if h(current) == 0:                                     # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
         if current.depth != d:                                  # print depth if changed
             d = current.depth
@@ -103,23 +101,20 @@ def BFS(inode):
         expand(current)                                         # expand and add new states to frontier
         searched.append(current)                                # add the current node to the closed list
 
-def DFS(inode):
-    noStates = 0
+def DFS():
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
         current = frontier.pop()                                # examine last item from frontier (LIFO)
         
-        current.heur = h(current)
-        if current.heur == 0:                                   # goal check
+        if h(current) == 0:                                     # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
         
         expand(current)                                         # expand and add new states to frontier
         searched.append(current)                                # add the current node to the closed list
 
-def GBEST(inode):
-    noStates = 0
+def GBEST():
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
@@ -128,15 +123,13 @@ def GBEST(inode):
         
         current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest heuristic function)
         
-        current.heur = h(current)
-        if current.heur == 0:                                   # goal check
+        if h(current) == 0:                                     # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
         
         expand(current)                                         # expand and add new states to frontier
         searched.append(current)                                # add the current node to the closed list
         
-def ASTAR(inode):
-    noStates = 0
+def ASTAR():
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
@@ -144,8 +137,8 @@ def ASTAR(inode):
         frontier.sort(key=lambda state: state.f())              # sort frontier according to exaluation function
         
         current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest evaluation function)
-        current.heur = h(current)
-        if current.heur == 0:                                   # goal check
+
+        if h(current) == 0:                                     # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
         
         expand(current)                                         # expand and add new states to frontier
@@ -163,6 +156,7 @@ if __name__ =='__main__':
     path = []
     frontier = []                                       # open list (frontier)
     searched = []                                       # closed list
+    noStates = 0
     
     for i in range(0,noCouples):                        # add couples on left side of the river
         initial.shore.extend(couple)                    # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
@@ -177,13 +171,13 @@ if __name__ =='__main__':
     selection = int(input("Select the search strategy you would like to use: "))
     
     if(selection==1):
-        goal = BFS(initial)                             # search with Breadth-First-Search
+        goal = BFS()                             # search with Breadth-First-Search
     elif(selection==2):
-        goal = DFS(initial)                             # search with Depth-First-Search
+        goal = DFS()                             # search with Depth-First-Search
     elif(selection==3):
-        goal = GBEST(initial)                           # search with Greedy Best-First-Search
+        goal = GBEST()                           # search with Greedy Best-First-Search
     elif(selection==4):
-        goal = ASTAR(initial)                           # search with A*-Search-Algorithm
+        goal = ASTAR()                           # search with A*-Search-Algorithm
     else:
         print("invalid selection")
         sys.exit()
