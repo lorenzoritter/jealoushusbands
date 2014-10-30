@@ -53,52 +53,53 @@ def visited(shore, searched):
 def BFS(inode):
     queue = []                                  # open list (frontier)
     searched = []                               # closed list
-    d = -1
     
     queue.append(inode)
-    noStates = 0
+    round = 0
     
     while True:
-        noStates = noStates + 1
-        
-        if h(queue[0]) == 0:
-            print("\nVisited states: ", noStates)                       # goal check
+        round = round + 1
+        print("\nVisited state: ", round)
+        print("Queue:")
+        for i in range(0, len(queue)):
+            print(queue[i].state, queue[i].boat)
+            
+        if h(queue[0]) == 0:                                            # goal check
             return queue[0]
         
         current = queue.pop(0)
-        
-        
-        if current.depth != d:                                          # print depth if changed
-            d = current.depth
-            print("current depth: ", d, "\tcalculating...")
+        print("current: ", current.state, current.boat)
         
         good_people = isGood(current)                                   # people on the same side as the boat are "good"
         
-        for i in range(0, len(current.state)):                          # iterate through all possible state changes
+        for i in range(0, len(current.state)):
+           # move = a
             for j in range(i, len(current.state)):
+                move = i,j
+                print("move: ", move)
                 following = deepcopy(current)
+                following.parent = current
                 if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
                     following.state[i]=alterbit(following.state[i])     # move first person
                     if(i != j):                                         # move second person if different from first person
                         following.state[j]=alterbit(following.state[j])
                     following.boat = alterbit(following.boat)           # move boat
                     if visited(following, searched):                    # check if state was already visited
-                        True
+                        print("break: ", following.state, following.boat, " already searched.")
                     elif jealousy(following):                           # check if there is jealousy
+                        print("break: ", following.state, " not possible. A wife cannot be left with another man unless her husband is present.")
                         searched.append(following)
                     elif True:
                         following.depth = following.depth + 1           # increase depth
                         following.path.append(current)                  # add the parent node to the path
                         queue.append(following)                         # add the node to the queue
+                        print(following.state, following.boat,  " added to queue")
                 else:
-                    True
+                    print("break: not possible because boat is on the other side.")
         searched.append(current)                                        # add the current node to the closed list
                 
 if __name__ =='__main__':
-    noCouples = int(input("Enter the number of couples: "))
-    
-    time.perf_counter()
-    
+    noCouples = 3
     couple = [0,0]
     initial = Shore([], 0, 0)
     goal = Shore([], 0, 0)
@@ -107,11 +108,10 @@ if __name__ =='__main__':
     for i in range(0,noCouples):                # add couples on left side of the river
         initial.state.extend(couple)            # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
                                                 
-    goal = BFS(initial)                         # search
+    goal = BFS(initial)                        # search
     
     print("\nSuccess: ", goal.state)
     print("Depth: ", goal.depth)
     for i in goal.path:
         path.append(i.state)
     print("Path: ", path)
-    print("elapsed time: %.2fs" % time.perf_counter())
