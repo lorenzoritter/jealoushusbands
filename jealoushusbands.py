@@ -5,6 +5,7 @@ Created on 29.10.2014
 '''
 from copy import deepcopy
 import time
+import sys
 
 class Shore:
     state = None
@@ -70,25 +71,21 @@ def expand(shore):
                 elif True:
                     following.depth = following.depth + 1           # increase depth
                     following.path.append(shore)                    # add the parent node to the path
-                    queue.append(following)                         # add the node to the queue
+                    frontier.append(following)                         # add the node to the frontier
             else:
                 True
 
 
 def BFS(inode):
-
     d = -1                                      # current depth
-    
-    queue.append(inode)
     noStates = 0
-    
     while True:
         noStates = noStates + 1
         
-        current = queue.pop(0)
+        current = frontier.pop(0)                               # examine first item from frontier (FIFO)
         
         current.heur = h(current)
-        if current.heur == 0                                    # goal check
+        if current.heur == 0:                                   # goal check
             print("\nVisited states: ", noStates)               # if heuristic function equals 0, the goal is reached
             return current
         
@@ -96,126 +93,57 @@ def BFS(inode):
             d = current.depth
             print("current depth: ", d, "\tcalculating...")
         
-        expand(current)                                         # expand and add to queue (frontier)
+        expand(current)                                         # expand and add new states to frontier
         searched.append(current)                                # add the current node to the closed list
 
 def DFS(inode):
-    queue.append(inode)
     noStates = 0
-    
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
-        current = queue.pop()
+        current = frontier.pop()                                # examine last item from frontier (LIFO)
         
         current.heur = h(current)
-        if current.heur == 0:                                           # goal check
-            return current                                              # if heuristic function equals 0, the goal is reached
+        if current.heur == 0:                                   # goal check
+            return current                                      # if heuristic function equals 0, the goal is reached
         
-        good_people = isGood(current)                                   # people on the same side as the boat are "good"
-        
-        for i in range(0, len(current.state)):                          # iterate through all possible state changes
-            for j in range(i, len(current.state)):
-                following = deepcopy(current)
-                if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
-                    following.state[i]=alterbit(following.state[i])     # move first person
-                    if(i != j):                                         # move second person if different from first person
-                        following.state[j]=alterbit(following.state[j])
-                    following.boat = alterbit(following.boat)           # move boat
-                    if visited(following, searched):                    # check if state was already visited
-                        True
-                    elif jealousy(following):                           # check if there is jealousy
-                        searched.append(following)
-                    elif True:
-                        following.depth = following.depth + 1           # increase depth
-                        following.path.append(current)                  # add the parent node to the path
-                        queue.append(following)                         # add the node to the queue
-                else:
-                    True
-        searched.append(current)                                        # add the current node to the closed list
+        expand(current)                                         # expand and add new states to frontier
+        searched.append(current)                                # add the current node to the closed list
 
 def GBEST(inode):
-    queue = []                                  # open list (frontier)
-    searched = []                               # closed list
-    
-    queue.append(inode)
     noStates = 0
-    
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
-        queue.sort(key=lambda Shore: Shore.f())
+        frontier.sort(key=lambda Shore: h(Shore))               # sort frontier according to heristic function
         
-        current = queue.pop()
+        current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest heuristic function)
         
         current.heur = h(current)
-        if current.heur == 0:                                           # goal check
-            return current                                              # if heuristic function equals 0, the goal is reached
+        if current.heur == 0:                                   # goal check
+            return current                                      # if heuristic function equals 0, the goal is reached
         
-        good_people = isGood(current)                                   # people on the same side as the boat are "good"
-        
-        for i in range(0, len(current.state)):                          # iterate through all possible state changes
-            for j in range(i, len(current.state)):
-                following = deepcopy(current)
-                if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
-                    following.state[i]=alterbit(following.state[i])     # move first person
-                    if(i != j):                                         # move second person if different from first person
-                        following.state[j]=alterbit(following.state[j])
-                    following.boat = alterbit(following.boat)           # move boat
-                    if visited(following, searched):                    # check if state was already visited
-                        True
-                    elif jealousy(following):                           # check if there is jealousy
-                        searched.append(following)
-                    elif True:
-                        following.depth = following.depth + 1           # increase depth
-                        following.path.append(current)                  # add the parent node to the path
-                        queue.append(following)                         # add the node to the queue
-                else:
-                    True
-        searched.append(current)                                        # add the current node to the closed list
+        expand(current)                                         # expand and add new states to frontier
+        searched.append(current)                                # add the current node to the closed list
         
 def ASTAR(inode):
-    queue = []                                  # open list (frontier)
-    searched = []                               # closed list
-    
-    queue.append(inode)
     noStates = 0
-    
     while True:
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
-        queue.sort(key=lambda Shore: h(Shore))
+        frontier.sort(key=lambda Shore: Shore.f())              # sort frontier according to exaluation function
         
-        current = queue.pop()
+        current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest evaluation function)
         
         current.heur = h(current)
-        if current.heur == 0:                                           # goal check
-            return current                                              # if heuristic function equals 0, the goal is reached
+        if current.heur == 0:                                   # goal check
+            return current                                      # if heuristic function equals 0, the goal is reached
         
-        good_people = isGood(current)                                   # people on the same side as the boat are "good"
-        
-        for i in range(0, len(current.state)):                          # iterate through all possible state changes
-            for j in range(i, len(current.state)):
-                following = deepcopy(current)
-                if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
-                    following.state[i]=alterbit(following.state[i])     # move first person
-                    if(i != j):                                         # move second person if different from first person
-                        following.state[j]=alterbit(following.state[j])
-                    following.boat = alterbit(following.boat)           # move boat
-                    if visited(following, searched):                    # check if state was already visited
-                        True
-                    elif jealousy(following):                           # check if there is jealousy
-                        searched.append(following)
-                    elif True:
-                        following.depth = following.depth + 1           # increase depth
-                        following.path.append(current)                  # add the parent node to the path
-                        queue.append(following)                         # add the node to the queue
-                else:
-                    True
-        searched.append(current)                                        # add the current node to the closed list
+        expand(current)                                         # expand and add new states to frontier
+        searched.append(current)                                # add the current node to the closed list
                 
 if __name__ =='__main__':
     noCouples = int(input("Enter the number of couples: "))
@@ -227,15 +155,32 @@ if __name__ =='__main__':
     goal = Shore([], 0)
     path = []
     
-    for i in range(0,noCouples):                    # add couples on left side of the river
-        initial.state.extend(couple)                # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
+    for i in range(0,noCouples):                        # add couples on left side of the river
+        initial.state.extend(couple)                    # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
     
-    queue = []                                      # open list (frontier)
-    searched = []                                   # closed list
+    frontier = []                                      # open list (frontier)
+    searched = []                                       # closed list
     
-    queue.append(initial)
-                                                
-    goal = ASTAR(initial)                           # search
+    frontier.append(initial)                           # add initial node to frontier
+    
+    print("\nsearch strategies:")
+    print("\t(1) Breadth-First-Search")
+    print("\t(2) Depth-First-Search")
+    print("\t(3) Greedy Best-First-Search")
+    print("\t(4) A*-Search-Algorithm")
+    selection = int(input("Select the search strategy you would like to use: "))
+    
+    if(selection==1):
+        goal = BFS(initial)                             # search with Breadth-First-Search
+    elif(selection==2):
+        goal = DFS(initial)                             # search with Depth-First-Search
+    elif(selection==3):
+        goal = GBEST(initial)                           # search with Greedy Best-First-Search
+    elif(selection==4):
+        goal = ASTAR(initial)                           # search with A*-Search-Algorithm
+    else:
+        print("invalid selection")
+        sys.exit()
     
     print("\nSuccess: ", goal.state, " reached")
     print("Depth: ", goal.depth)
