@@ -8,10 +8,10 @@ import time
 import sys
 
 class State:
-    shore = None
-    boat = 0
+    shore = None                        # array with the position of the people in the order w1, w2,... h1, h2, ... (0 for initial shore, 1 for goal shore)
+    boat = 0                            # position of the boat (0 for initial shore, 1 for goal shore)
     depth = 0                           # equals path cost in this example because unit step cost = 1
-    path = None
+    path = None                         # array of States that lead to the current State
     
     def __init__(self, s=[], b=0):
         self.shore = s
@@ -20,60 +20,68 @@ class State:
         self.path = []
         
     def f(self):                        # evaluation function
-        return self.depth + h(self)
+        return self.depth + h(self)     # f(n) = g(n) + h(n)
           
 
 def jealousy(current):
     for i in range(0,noCouples):
         if current.shore[i] != current.shore[noCouples+i]:          # husband is not with his wife
             for j in range(noCouples, noCouples*2): 
-                    if(current.shore[j] == current.shore[i]):       # another husband is with the wife, so jealousy occurs
+                    if(current.shore[j] == current.shore[i]):       # another man is with the wife
                         return 1
     return 0
 
-def alterbit(bit):
+def alterbit(bit):                                                  # used to change position of people or the boat
     return abs(bit - 1)
 
 def isGood(state):                                                  # people on the same side as the boat are "good"
-    good_people = deepcopy(initial.shore)
+    good_people = deepcopy(state.shore)
     for i in range(0, len(state.shore)):
         if state.shore[i] == state.boat:
             good_people[i] = 1
     return good_people
 
-def h(state):
+def h(state):                                                       # the heuristic function equals the number of people who are not on the goal shore
     result = len(state.shore)
     for i in state.shore:
         result = result - i
     return result
 
-def visited(state, searched):
+def visited(state, searched):                                       # determines whether a State has already been visited
     for k in range(0, len(searched)):
         if state.shore == searched[k].shore and state.boat == searched[k].boat:
             return True
     return False
 
-def expand(state):
-    good_people = isGood(state)                                     # people on the same side as the boat are "good"
-        
-    for i in range(0, len(state.shore)):                            # iterate through all possible state changes
-        for j in range(i, len(state.shore)):
-            following = deepcopy(state)
-            if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
-                following.shore[i]=alterbit(following.shore[i])     # move first person
-                if(i != j):                                         # move second person if different from first person
-                    following.shore[j]=alterbit(following.shore[j])
-                following.boat = alterbit(following.boat)           # move boat
-                if visited(following, searched):                    # check if state was already visited
-                    True
-                elif jealousy(following):                           # check if there is jealousy
-                    searched.append(following)
-                elif True:
-                    following.depth = following.depth + 1           # increase depth
-                    following.path.append(state)                    # add the parent node to the path
-                    frontier.append(following)                      # add the node to the frontier
-            else:
-                True
+def move(cap, state, movement, result, start):                      # computes all possible moves from a current State with a certain boat capacity
+    for i in range(start, len(state.shore)):
+        if isGood(state)[i] == 1:                                   # if the person is on the same side as the boat
+            movement.append(i)                                      # add the person to the list of possible moves
+            if cap > 1:                                             # if ther is more space in the boat
+                move(cap-1, state, movement, result,i)              # iterate until the boat is full, start for-loop with i to prevent duplicate (permutations)
+            if cap == 1:                                            # if the boat is full
+                result.append(deepcopy(movement))                   # add move to the result array
+            movement.pop()                                          # when returning to the outer iteration, pop the last item
+    return result                                                   # return an array of possible move
+
+def expand(state): 
+    following = deepcopy(state)
+    result = [] 
+    possible_moves = move(boat_capacity, state, [], result,0)       # get all possible moves for the current State and capacity
+    for i in possible_moves:                                        # iterate through all possible state changes
+        following = deepcopy(state)
+        for j in i:
+            following.shore[j]  = alterbit(state.shore[j])          # move persons
+        following.boat = alterbit(state.boat)                       # move boat
+        if visited(following, searched):                            # check if state was already visited
+            True
+        elif jealousy(following):                                   # check if there is jealousy
+            searched.append(following)
+        elif True:
+            following.depth = following.depth + 1                   # increase depth
+            following.path.append(state)                            # add the parent node to the path
+            frontier.append(following)                              # add the node to the frontier
+            
 
 
 def BFS(inode):
@@ -88,7 +96,6 @@ def BFS(inode):
         current.heur = h(current)
         if current.heur == 0:                                   # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
-        
         if current.depth != d:                                  # print depth if changed
             d = current.depth
             print("current depth: ", d)
@@ -137,7 +144,6 @@ def ASTAR(inode):
         frontier.sort(key=lambda state: state.f())              # sort frontier according to exaluation function
         
         current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest evaluation function)
-        
         current.heur = h(current)
         if current.heur == 0:                                   # goal check
             return current                                      # if heuristic function equals 0, the goal is reached
@@ -147,6 +153,7 @@ def ASTAR(inode):
                 
 if __name__ =='__main__':
     noCouples = int(input("Enter the number of couples: "))
+    boat_capacity = int(input("How many persons can the boat hold: "))
     
     time.perf_counter()
     
@@ -154,12 +161,11 @@ if __name__ =='__main__':
     initial = State([], 0)
     goal = State([], 0)
     path = []
+    frontier = []                                       # open list (frontier)
+    searched = []                                       # closed list
     
     for i in range(0,noCouples):                        # add couples on left side of the river
         initial.shore.extend(couple)                    # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
-    
-    frontier = []                                       # open list (frontier)
-    searched = []                                       # closed list
     
     frontier.append(initial)                            # add initial node to frontier
     
