@@ -9,14 +9,17 @@ import time
 class Shore:
     state = None
     boat = 0
-    depth = 0
+    depth = 0                           # equals path cost in this example because unit step cost = 1
     path = None
     
-    def __init__(self, s=[], b=0, d=0):
+    def __init__(self, s=[], b=0):
         self.state = s
         self.boat = b
-        self.depth = d
+        self.depth = 0
         self.path = []
+        
+    def f(self):                        # evaluation function
+        return self.depth + h(self)
           
 
 def jealousy(current):
@@ -49,11 +52,32 @@ def visited(shore, searched):
             return True
     return False
 
+def expand(shore):
+    good_people = isGood(shore)                                     # people on the same side as the boat are "good"
+        
+    for i in range(0, len(shore.state)):                            # iterate through all possible state changes
+        for j in range(i, len(shore.state)):
+            following = deepcopy(shore)
+            if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
+                following.state[i]=alterbit(following.state[i])     # move first person
+                if(i != j):                                         # move second person if different from first person
+                    following.state[j]=alterbit(following.state[j])
+                following.boat = alterbit(following.boat)           # move boat
+                if visited(following, searched):                    # check if state was already visited
+                    True
+                elif jealousy(following):                           # check if there is jealousy
+                    searched.append(following)
+                elif True:
+                    following.depth = following.depth + 1           # increase depth
+                    following.path.append(shore)                    # add the parent node to the path
+                    queue.append(following)                         # add the node to the queue
+            else:
+                True
+
 
 def BFS(inode):
-    queue = []                                  # open list (frontier)
-    searched = []                               # closed list
-    d = -1
+
+    d = -1                                      # current depth
     
     queue.append(inode)
     noStates = 0
@@ -61,16 +85,115 @@ def BFS(inode):
     while True:
         noStates = noStates + 1
         
-        if h(queue[0]) == 0:
-            print("\nVisited states: ", noStates)                       # goal check
-            return queue[0]
-        
         current = queue.pop(0)
         
+        current.heur = h(current)
+        if current.heur == 0                                    # goal check
+            print("\nVisited states: ", noStates)               # if heuristic function equals 0, the goal is reached
+            return current
         
-        if current.depth != d:                                          # print depth if changed
+        if current.depth != d:                                  # print depth if changed
             d = current.depth
             print("current depth: ", d, "\tcalculating...")
+        
+        expand(current)                                         # expand and add to queue (frontier)
+        searched.append(current)                                # add the current node to the closed list
+
+def DFS(inode):
+    queue.append(inode)
+    noStates = 0
+    
+    while True:
+        noStates = noStates + 1
+        print("Visited states: ", noStates)
+        
+        current = queue.pop()
+        
+        current.heur = h(current)
+        if current.heur == 0:                                           # goal check
+            return current                                              # if heuristic function equals 0, the goal is reached
+        
+        good_people = isGood(current)                                   # people on the same side as the boat are "good"
+        
+        for i in range(0, len(current.state)):                          # iterate through all possible state changes
+            for j in range(i, len(current.state)):
+                following = deepcopy(current)
+                if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
+                    following.state[i]=alterbit(following.state[i])     # move first person
+                    if(i != j):                                         # move second person if different from first person
+                        following.state[j]=alterbit(following.state[j])
+                    following.boat = alterbit(following.boat)           # move boat
+                    if visited(following, searched):                    # check if state was already visited
+                        True
+                    elif jealousy(following):                           # check if there is jealousy
+                        searched.append(following)
+                    elif True:
+                        following.depth = following.depth + 1           # increase depth
+                        following.path.append(current)                  # add the parent node to the path
+                        queue.append(following)                         # add the node to the queue
+                else:
+                    True
+        searched.append(current)                                        # add the current node to the closed list
+
+def GBEST(inode):
+    queue = []                                  # open list (frontier)
+    searched = []                               # closed list
+    
+    queue.append(inode)
+    noStates = 0
+    
+    while True:
+        noStates = noStates + 1
+        print("Visited states: ", noStates)
+        
+        queue.sort(key=lambda Shore: Shore.f())
+        
+        current = queue.pop()
+        
+        current.heur = h(current)
+        if current.heur == 0:                                           # goal check
+            return current                                              # if heuristic function equals 0, the goal is reached
+        
+        good_people = isGood(current)                                   # people on the same side as the boat are "good"
+        
+        for i in range(0, len(current.state)):                          # iterate through all possible state changes
+            for j in range(i, len(current.state)):
+                following = deepcopy(current)
+                if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
+                    following.state[i]=alterbit(following.state[i])     # move first person
+                    if(i != j):                                         # move second person if different from first person
+                        following.state[j]=alterbit(following.state[j])
+                    following.boat = alterbit(following.boat)           # move boat
+                    if visited(following, searched):                    # check if state was already visited
+                        True
+                    elif jealousy(following):                           # check if there is jealousy
+                        searched.append(following)
+                    elif True:
+                        following.depth = following.depth + 1           # increase depth
+                        following.path.append(current)                  # add the parent node to the path
+                        queue.append(following)                         # add the node to the queue
+                else:
+                    True
+        searched.append(current)                                        # add the current node to the closed list
+        
+def ASTAR(inode):
+    queue = []                                  # open list (frontier)
+    searched = []                               # closed list
+    
+    queue.append(inode)
+    noStates = 0
+    
+    while True:
+        noStates = noStates + 1
+        print("Visited states: ", noStates)
+        
+        queue.sort(key=lambda Shore: h(Shore))
+        
+        current = queue.pop()
+        
+        current.heur = h(current)
+        if current.heur == 0:                                           # goal check
+            return current                                              # if heuristic function equals 0, the goal is reached
         
         good_people = isGood(current)                                   # people on the same side as the boat are "good"
         
@@ -100,16 +223,21 @@ if __name__ =='__main__':
     time.perf_counter()
     
     couple = [0,0]
-    initial = Shore([], 0, 0)
-    goal = Shore([], 0, 0)
+    initial = Shore([], 0)
+    goal = Shore([], 0)
     path = []
-
-    for i in range(0,noCouples):                # add couples on left side of the river
-        initial.state.extend(couple)            # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
-                                                
-    goal = BFS(initial)                         # search
     
-    print("\nSuccess: ", goal.state)
+    for i in range(0,noCouples):                    # add couples on left side of the river
+        initial.state.extend(couple)                # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
+    
+    queue = []                                      # open list (frontier)
+    searched = []                                   # closed list
+    
+    queue.append(initial)
+                                                
+    goal = ASTAR(initial)                           # search
+    
+    print("\nSuccess: ", goal.state, " reached")
     print("Depth: ", goal.depth)
     for i in goal.path:
         path.append(i.state)
