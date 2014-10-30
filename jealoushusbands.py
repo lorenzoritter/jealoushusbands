@@ -7,14 +7,14 @@ from copy import deepcopy
 import time
 import sys
 
-class Shore:
-    state = None
+class State:
+    shore = None
     boat = 0
     depth = 0                           # equals path cost in this example because unit step cost = 1
     path = None
     
     def __init__(self, s=[], b=0):
-        self.state = s
+        self.shore = s
         self.boat = b
         self.depth = 0
         self.path = []
@@ -25,44 +25,44 @@ class Shore:
 
 def jealousy(current):
     for i in range(0,noCouples):
-        if current.state[i] != current.state[noCouples+i]:          # husband is not with his wife
+        if current.shore[i] != current.shore[noCouples+i]:          # husband is not with his wife
             for j in range(noCouples, noCouples*2): 
-                    if(current.state[j] == current.state[i]):       # another husband is with the wife, so jealousy occurs
+                    if(current.shore[j] == current.shore[i]):       # another husband is with the wife, so jealousy occurs
                         return 1
     return 0
 
 def alterbit(bit):
     return abs(bit - 1)
 
-def isGood(shore):                                                  # people on the same side as the boat are "good"
-    good_people = deepcopy(initial.state)
-    for i in range(0, len(shore.state)):
-        if shore.state[i] == shore.boat:
+def isGood(state):                                                  # people on the same side as the boat are "good"
+    good_people = deepcopy(initial.shore)
+    for i in range(0, len(state.shore)):
+        if state.shore[i] == state.boat:
             good_people[i] = 1
     return good_people
 
-def h(shore):
-    result = len(shore.state)
-    for i in shore.state:
+def h(state):
+    result = len(state.shore)
+    for i in state.shore:
         result = result - i
     return result
 
-def visited(shore, searched):
+def visited(state, searched):
     for k in range(0, len(searched)):
-        if shore.state == searched[k].state and shore.boat == searched[k].boat:
+        if state.shore == searched[k].shore and state.boat == searched[k].boat:
             return True
     return False
 
-def expand(shore):
-    good_people = isGood(shore)                                     # people on the same side as the boat are "good"
+def expand(state):
+    good_people = isGood(state)                                     # people on the same side as the boat are "good"
         
-    for i in range(0, len(shore.state)):                            # iterate through all possible state changes
-        for j in range(i, len(shore.state)):
-            following = deepcopy(shore)
+    for i in range(0, len(state.shore)):                            # iterate through all possible state changes
+        for j in range(i, len(state.shore)):
+            following = deepcopy(state)
             if(good_people[i]==1 and good_people[j]==1):            # check that the persons are on the same side as the boat
-                following.state[i]=alterbit(following.state[i])     # move first person
+                following.shore[i]=alterbit(following.shore[i])     # move first person
                 if(i != j):                                         # move second person if different from first person
-                    following.state[j]=alterbit(following.state[j])
+                    following.shore[j]=alterbit(following.shore[j])
                 following.boat = alterbit(following.boat)           # move boat
                 if visited(following, searched):                    # check if state was already visited
                     True
@@ -70,28 +70,28 @@ def expand(shore):
                     searched.append(following)
                 elif True:
                     following.depth = following.depth + 1           # increase depth
-                    following.path.append(shore)                    # add the parent node to the path
-                    frontier.append(following)                         # add the node to the frontier
+                    following.path.append(state)                    # add the parent node to the path
+                    frontier.append(following)                      # add the node to the frontier
             else:
                 True
 
 
 def BFS(inode):
-    d = -1                                      # current depth
+    d = -1                                                      # current depth
     noStates = 0
     while True:
         noStates = noStates + 1
+        print("Visited states: ", noStates)
         
         current = frontier.pop(0)                               # examine first item from frontier (FIFO)
         
         current.heur = h(current)
         if current.heur == 0:                                   # goal check
-            print("\nVisited states: ", noStates)               # if heuristic function equals 0, the goal is reached
-            return current
+            return current                                      # if heuristic function equals 0, the goal is reached
         
         if current.depth != d:                                  # print depth if changed
             d = current.depth
-            print("current depth: ", d, "\tcalculating...")
+            print("current depth: ", d)
         
         expand(current)                                         # expand and add new states to frontier
         searched.append(current)                                # add the current node to the closed list
@@ -117,7 +117,7 @@ def GBEST(inode):
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
-        frontier.sort(key=lambda Shore: h(Shore))               # sort frontier according to heristic function
+        frontier.sort(key=lambda state: h(state))               # sort frontier according to heristic function
         
         current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest heuristic function)
         
@@ -134,7 +134,7 @@ def ASTAR(inode):
         noStates = noStates + 1
         print("Visited states: ", noStates)
         
-        frontier.sort(key=lambda Shore: Shore.f())              # sort frontier according to exaluation function
+        frontier.sort(key=lambda state: state.f())              # sort frontier according to exaluation function
         
         current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest evaluation function)
         
@@ -151,17 +151,17 @@ if __name__ =='__main__':
     time.perf_counter()
     
     couple = [0,0]
-    initial = Shore([], 0)
-    goal = Shore([], 0)
+    initial = State([], 0)
+    goal = State([], 0)
     path = []
     
     for i in range(0,noCouples):                        # add couples on left side of the river
-        initial.state.extend(couple)                    # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
+        initial.shore.extend(couple)                    # the state will be treated as wife1, wife2, wife3, ... husband1, husband2, husband3, ...
     
-    frontier = []                                      # open list (frontier)
+    frontier = []                                       # open list (frontier)
     searched = []                                       # closed list
     
-    frontier.append(initial)                           # add initial node to frontier
+    frontier.append(initial)                            # add initial node to frontier
     
     print("\nsearch strategies:")
     print("\t(1) Breadth-First-Search")
@@ -182,9 +182,9 @@ if __name__ =='__main__':
         print("invalid selection")
         sys.exit()
     
-    print("\nSuccess: ", goal.state, " reached")
+    print("\nSuccess: ", goal.shore, " reached")
     print("Depth: ", goal.depth)
     for i in goal.path:
-        path.append(i.state)
+        path.append(i.shore)
     print("Path: ", path)
     print("elapsed time: %.2fs" % time.perf_counter())
