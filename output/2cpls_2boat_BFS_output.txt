@@ -1,0 +1,47 @@
+Enter the number of couples: 2
+How many persons can the boat hold: 2
+
+search strategies:
+	(1) Breadth-First-Search
+	(2) Depth-First-Search
+	(3) Greedy Best-First-Search
+	(4) A*-Search-Algorithm
+Select the search strategy you would like to use: 1
+Visited states:  1
+current depth:  0
+Visited states:  2
+current depth:  1
+Visited states:  3
+Visited states:  4
+Visited states:  5
+Visited states:  6
+Visited states:  7
+Visited states:  8
+current depth:  2
+Visited states:  9
+Visited states:  10
+Visited states:  11
+Visited states:  12
+current depth:  3
+Visited states:  13
+Visited states:  14
+Visited states:  15
+Visited states:  16
+Visited states:  17
+Visited states:  18
+Visited states:  19
+Visited states:  20
+current depth:  4
+Visited states:  21
+Visited states:  22
+Visited states:  23
+Visited states:  24
+Visited states:  25
+Visited states:  26
+Visited states:  27
+Visited states:  28
+
+Success:  [1, 1, 1, 1]  reached
+Depth:  5
+Path:  [[0, 0, 0, 0], [1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1], [0, 0, 1, 1]]
+elapsed time: 1.20s

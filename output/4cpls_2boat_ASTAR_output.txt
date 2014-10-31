@@ -1,0 +1,98 @@
+Enter the number of couples: 4
+
+search strategies:
+	(1) Breadth-First-Search
+	(2) Depth-First-Search
+	(3) Greedy Best-First-Search
+	(4) A*-Search-Algorithm
+Select the search strategy you would like to use: 4
+Visited states:  1
+Visited states:  2
+Visited states:  3
+Visited states:  4
+Visited states:  5
+Visited states:  6
+Visited states:  7
+Visited states:  8
+Visited states:  9
+Visited states:  10
+Visited states:  11
+Visited states:  12
+Visited states:  13
+Visited states:  14
+Visited states:  15
+Visited states:  16
+Visited states:  17
+Visited states:  18
+Visited states:  19
+Visited states:  20
+Visited states:  21
+Visited states:  22
+Visited states:  23
+Visited states:  24
+Visited states:  25
+Visited states:  26
+Visited states:  27
+Visited states:  28
+Visited states:  29
+Visited states:  30
+Visited states:  31
+Visited states:  32
+Visited states:  33
+Visited states:  34
+Visited states:  35
+Visited states:  36
+Visited states:  37
+Visited states:  38
+Visited states:  39
+Visited states:  40
+Visited states:  41
+Visited states:  42
+Visited states:  43
+Visited states:  44
+Visited states:  45
+Visited states:  46
+Visited states:  47
+Visited states:  48
+Visited states:  49
+Visited states:  50
+Visited states:  51
+Visited states:  52
+Visited states:  53
+Visited states:  54
+Visited states:  55
+Visited states:  56
+Visited states:  57
+Visited states:  58
+Visited states:  59
+Visited states:  60
+Visited states:  61
+Visited states:  62
+Visited states:  63
+Visited states:  64
+Visited states:  65
+Visited states:  66
+Visited states:  67
+Visited states:  68
+Visited states:  69
+Visited states:  70
+Visited states:  71
+Visited states:  72
+Visited states:  73
+Visited states:  74
+Visited states:  75
+Visited states:  76
+Visited states:  77
+Visited states:  78
+Visited states:  79
+Visited states:  80
+Visited states:  81
+Visited states:  82
+Visited states:  83
+Visited states:  84
+Traceback (most recent call last):
+  File "C:\Users\Lorenzo Ritter\workspaceEK\JealousHusbands\jealoushusbands\jealoushusbands.py", line 180, in <module>
+    goal = ASTAR(initial)                           # search with A*-Search-Algorithm
+  File "C:\Users\Lorenzo Ritter\workspaceEK\JealousHusbands\jealoushusbands\jealoushusbands.py", line 139, in ASTAR
+    current = frontier.pop(0)                               # examine first item of the frontier (item with the lowest evaluation function)
+IndexError: pop from empty list
